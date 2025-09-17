@@ -90,14 +90,14 @@ class AntoniiFramework:
 
         if method == 'POST':
             try:
-                length = int(environ.get('CONTENT_LENGTH') or 0)
+                length = int(environ.get('CONTENT_LENGTH', 0) or 0)
             except (ValueError, TypeError):
                 length = 0
-            body = environ['wsgi.input'].read(length) if length else b''
-            decoded = body.decode('utf-8')
-            result = handler(decoded, **params_kwargs) if params_kwargs else handler(decoded)
+            body = environ['wsgi.input'].read(length) if length > 0 else b''
+            args = (body.decode('utf-8'),)
         else:
-            result = handler(**params_kwargs) if params_kwargs else handler()
+            args = ()
+        result = handler(*args, **params_kwargs) if params_kwargs else handler(*args)
 
         if isinstance(result, bytes):
             body_bytes = result
@@ -117,7 +117,7 @@ def hello():
     return "Hello, world!"
 
 @app.post('/echo')
-def echo():
+def echo(body):
     return "Post received"
 
 @app.get('/book/<id>')
