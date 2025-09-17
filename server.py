@@ -4,7 +4,6 @@ class AntoniiFramework:
         self.dynamic_routes = {}
 
     def add_route(self, method, path, handler):
-        method = method.upper()
         if '<' in path and '>' in path:
             pattern_parts, param_names, param_types = self.splitter(path)
             self.dynamic_routes.setdefault(method, []).append(
@@ -54,19 +53,18 @@ class AntoniiFramework:
                     continue
                 captured = {}
                 matched = True
-                param_idx = 0
+                param_index = 0
                 for pattern_part, path_part in zip(pattern_parts, path_parts):
                     if pattern_part.startswith('<') and pattern_part.endswith('>'):
-                        name = param_names[param_idx]
-                        typ = param_types[param_idx]
-                        param_idx += 1
+                        name = param_names[param_index]
+                        type = param_types[param_index]
+                        param_index += 1
                         try:
-                            if typ == 'int':
+                            if type == 'int':
                                 value = int(path_part)
-                            elif typ in ('str', '', None):
+                            elif type in ('str', '', None):
                                 value = path_part
                             else:
-                                # Unknown types fall back to str
                                 value = path_part
                             captured[name] = value
                         except Exception:
